@@ -57,6 +57,9 @@ return [
     // Allow users to add comments when rejecting items (recommended)
     "enable_rejection_comments" => true,
     
+    // Allow users to add comments when returning items (recommended)
+    "enable_return_comments" => true,
+    
     // Allow users to add comments when discarding items
     "enable_discard_comments" => true,
     

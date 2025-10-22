@@ -21,10 +21,12 @@ return [
         'approve' => 'Approve',
         'discard' => 'Discard',
         'reject' => 'Reject',
+        'return' => 'Return',
         'verify' => 'Verify',
         'check' => 'Check',
         'submit' => 'Submit',
         'reject_confirmation_text' => 'Are you sure you want to reject this record?',
+        'return_confirmation_text' => 'Are you sure you want to return this record?',
         'approve_confirmation_text' => 'Are you sure you want to approve this record?',
         'discard_confirmation_text' => 'Are you sure you want to discard this record?',
         'submit_confirmation_text' => 'Are you sure you want to submit this record to the next step in the flow?',
@@ -32,8 +34,12 @@ return [
         'history' => [
             'Approved' => 'Approved',
             'Rejected' => 'Rejected',
+            'Returned' => 'Returned',
             'Discarded' => 'Discarded',
             'Submitted' => 'Submitted',
         ]
+    ],
+    'notifications' => [
+        'returned' => 'Returned successfully',
     ]
 ];
