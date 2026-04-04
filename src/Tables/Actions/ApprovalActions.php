@@ -16,8 +16,9 @@ class ApprovalActions
             ActionGroup::make([
                 SubmitAction::make(),
                 ApproveAction::make(),
-                DiscardAction::make(),
+                ReturnAction::make(),
                 RejectAction::make(),
+                DiscardAction::make(),
             ])
                 ->label(__('filament-approvals::approvals.actions.approvals'))
                 ->icon('heroicon-m-ellipsis-vertical')

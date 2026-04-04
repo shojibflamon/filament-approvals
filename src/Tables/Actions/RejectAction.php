@@ -31,8 +31,8 @@ class RejectAction extends Action
             ->label(__('filament-approvals::approvals.actions.reject'))
             ->visible(
                 fn (Model $record) =>
-                $record->canBeApprovedBy(Auth::user()) &&
                     $record->isSubmitted() &&
+                    $record->canBeApprovedBy(Auth::user()) &&
                     !$record->isApprovalCompleted() &&
                     !$record->isDiscarded() &&
                     !$record->isRejected()

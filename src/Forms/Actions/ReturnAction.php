@@ -1,11 +1,11 @@
 <?php
 
-namespace EightyNine\Approvals\Tables\Actions;
+namespace EightyNine\Approvals\Forms\Actions;
 
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;

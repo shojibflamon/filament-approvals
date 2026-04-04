@@ -32,8 +32,8 @@ class ApproveAction extends Action
             ->visible(
                 fn (Model $record) =>
 //                dump($record) . dump($record->canBeApprovedBy(Auth::user())) . dump($record->isSubmitted()).dump(!$record->isApprovalCompleted())  .dump(!$record->isDiscarded()).dd('hit').
-                $record->canBeApprovedBy(Auth::user()) &&
                     $record->isSubmitted() &&
+                    $record->canBeApprovedBy(Auth::user()) &&
                     !$record->isApprovalCompleted() &&
                     !$record->isDiscarded()
             )

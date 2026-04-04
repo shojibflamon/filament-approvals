@@ -65,6 +65,9 @@ return [
     
     // Require comments for rejections (helps with audit trail)
     "require_rejection_comments" => false,
+    
+    // Require comments for returns (helps with audit trail)
+    "require_return_comments" => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -89,6 +92,7 @@ return [
             "pending" => "warning",
             "approved" => "success", 
             "rejected" => "danger",
+            "returned" => "warning",
             "discarded" => "gray",
             "submitted" => "info",
         ],
@@ -135,6 +139,7 @@ return [
             "submitted",
             "approved", 
             "rejected",
+            "returned",
             "completed",
         ],
     ],

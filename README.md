@@ -241,6 +241,7 @@ return [
     
     // Comment settings
     "enable_approval_comments" => false, // Allow comments when approving
+    "enable_return_comments" => true, // Allow comments when returning items
     "enable_rejection_comments" => true, // Allow comments when rejecting
 ];
 ```

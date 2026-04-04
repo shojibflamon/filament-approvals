@@ -28,8 +28,8 @@ class DiscardAction extends Action
             ->label(__('filament-approvals::approvals.actions.discard'))
             ->visible(
                 fn (Model $record) =>
-                $record->canBeApprovedBy(Auth::user()) &&
-                    $record->isRejected()
+                $record->isRejected() &&
+                $record->canBeApprovedBy(Auth::user())
             )
             ->requiresConfirmation()
             ->modalDescription(__('filament-approvals::approvals.actions.discard_confirmation_text'));

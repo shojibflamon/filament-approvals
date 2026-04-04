@@ -6,6 +6,7 @@ namespace EightyNine\Approvals\Traits;
 use EightyNine\Approvals\Forms\Actions\ApproveAction;
 use EightyNine\Approvals\Forms\Actions\DiscardAction;
 use EightyNine\Approvals\Forms\Actions\RejectAction;
+use EightyNine\Approvals\Forms\Actions\ReturnAction;
 use EightyNine\Approvals\Forms\Actions\SubmitAction;
 use EightyNine\Approvals\Models\ApprovableModel;
 use Exception;
@@ -26,6 +27,7 @@ trait HasApprovalHeaderActions
         return [
             ApproveAction::make(),
             RejectAction::make(),
+            ReturnAction::make(),
             DiscardAction::make(),
             SubmitAction::make(),
             $this->getOnCompletionAction()
