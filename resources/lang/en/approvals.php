@@ -40,6 +40,11 @@ return [
         ]
     ],
     'notifications' => [
+        'submitted' => 'Submitted successfully',
+        'approved' => 'Approved successfully',
+        'rejected' => 'Rejected successfully',
         'returned' => 'Returned successfully',
+        'discarded' => 'Discarded successfully',
+        'completed' => 'Completed successfully',
     ]
 ];

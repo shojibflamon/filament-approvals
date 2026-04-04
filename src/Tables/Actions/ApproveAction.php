@@ -27,11 +27,9 @@ class ApproveAction extends Action
             ->action('Approve')
             ->label(__('filament-approvals::approvals.actions.approve'))
             ->icon('heroicon-m-check')
-            ->label(__('filament-approvals::approvals.actions.approve'))
             ->form($this->getDefaultForm())
             ->visible(
                 fn (Model $record) =>
-//                dump($record) . dump($record->canBeApprovedBy(Auth::user())) . dump($record->isSubmitted()).dump(!$record->isApprovalCompleted())  .dump(!$record->isDiscarded()).dd('hit').
                     $record->isSubmitted() &&
                     $record->canBeApprovedBy(Auth::user()) &&
                     !$record->isApprovalCompleted() &&
@@ -63,10 +61,16 @@ class ApproveAction extends Action
     {
         return function (array $data, Model $record): bool {
             $record->approve(comment: Arr::get($data, 'comment', ''), user: Auth::user());
-            Notification::make()
-                ->title('Approved successfully')
-                ->success()
-                ->send();
+            
+            if (config('approvals.notifications.database_enabled', true)) {
+                $events = config('approvals.notifications.events', ['submitted', 'approved', 'rejected', 'returned', 'completed']);
+                if (in_array('approved', $events)) {
+                    Notification::make()
+                        ->title(__('filament-approvals::approvals.notifications.approved'))
+                        ->success()
+                        ->send();
+                }
+            }
             return true;
         };
     }

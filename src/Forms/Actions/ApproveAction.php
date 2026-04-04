@@ -50,17 +50,22 @@ class ApproveAction extends Action
 
 
     /**
-     * Approve data function.
-     *
+     * Approve the record.
      */
     private function approveModel(): Closure
     {
         return function (array $data, Model $record): bool {
             $record->approve(comment: null, user: Auth::user());
-            Notification::make()
-                ->title('Approved successfully')
-                ->success()
-                ->send();
+            
+            if (config('approvals.notifications.database_enabled', true)) {
+                $events = config('approvals.notifications.events', ['submitted', 'approved', 'rejected', 'returned', 'completed']);
+                if (in_array('approved', $events)) {
+                    Notification::make()
+                        ->title(__('filament-approvals::approvals.notifications.approved'))
+                        ->success()
+                        ->send();
+                }
+            }
             return true;
         };
     }

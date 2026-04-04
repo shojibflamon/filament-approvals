@@ -54,17 +54,22 @@ class RejectAction extends Action
 
 
     /**
-     * Discard data function.
-     *
+     * Reject the record.
      */
     private function rejectModel(): Closure
     {
         return function (array $data, Model $record): bool {
             $record->reject($data["comment"], Auth::user());
-            Notification::make()
-                ->title('Rejected successfully')
-                ->success()
-                ->send();
+            
+            if (config('approvals.notifications.database_enabled', true)) {
+                $events = config('approvals.notifications.events', ['submitted', 'approved', 'rejected', 'returned', 'completed']);
+                if (in_array('rejected', $events)) {
+                    Notification::make()
+                        ->title(__('filament-approvals::approvals.notifications.rejected'))
+                        ->success()
+                        ->send();
+                }
+            }
 
             return true;
         };

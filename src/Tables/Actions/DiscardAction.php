@@ -49,17 +49,22 @@ class DiscardAction extends Action
 
 
     /**
-     * Discard data function.
-     *
+     * Discard the record.
      */
     private function discardModel(): Closure
     {
         return function (array $data, ApprovableModel $record): bool {
             $record->discard(null, Auth::user());
-            Notification::make()
-                ->title('Discarded successfully')
-                ->success()
-                ->send();
+            
+            if (config('approvals.notifications.database_enabled', true)) {
+                $events = config('approvals.notifications.events', ['submitted', 'approved', 'rejected', 'returned', 'completed']);
+                if (in_array('completed', $events)) {
+                    Notification::make()
+                        ->title(__('filament-approvals::approvals.notifications.discarded'))
+                        ->success()
+                        ->send();
+                }
+            }
 
             return true;
         };

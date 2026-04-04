@@ -94,6 +94,7 @@ class ApprovalFlowResource extends Resource
                 TextColumn::make("name"),
                 TextColumn::make("approvable_type"),
             ])
+            ->deferFilters(false)
             ->filters([
                 //
             ])

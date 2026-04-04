@@ -45,17 +45,22 @@ class SubmitAction extends Action
 
 
     /**
-     * Submit data function.
-     *
+     * Submit the record.
      */
     private function submitModel(): Closure
     {
         return function (array $data, Model $record): bool {
             $record->submit(Auth::user());
-            Notification::make()
-                ->title('Submitted successfully')
-                ->success()
-                ->send();
+            
+            if (config('approvals.notifications.database_enabled', true)) {
+                $events = config('approvals.notifications.events', ['submitted', 'approved', 'rejected', 'returned', 'completed']);
+                if (in_array('submitted', $events)) {
+                    Notification::make()
+                        ->title(__('filament-approvals::approvals.notifications.submitted'))
+                        ->success()
+                        ->send();
+                }
+            }
             return true;
         };
     }
