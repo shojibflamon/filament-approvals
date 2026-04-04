@@ -100,7 +100,7 @@ class ApprovalFormBuilderTest extends TestCase
         $this->assertGreaterThan(0, $toggles->count());
         
         // Check for specific toggles
-        $toggleNames = $toggles->pluck('name')->toArray();
+        $toggleNames = $toggles->map(fn($t) => $t->getName())->toArray();
         $this->assertContains('require_comments', $toggleNames);
         $this->assertContains('auto_submit', $toggleNames);
     }
