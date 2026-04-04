@@ -43,6 +43,7 @@ class ApprovalProgressColumnTest extends TestCase
         $column = ApprovalProgressColumn::make('approval_progress');
         
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(false);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(null);
         
         $percentage = $column->getProgressPercentage($record);
@@ -57,16 +58,17 @@ class ApprovalProgressColumnTest extends TestCase
         
         // Mock approval flow with 3 steps
         $approvalFlow = Mockery::mock(ProcessApprovalFlow::class);
-        $stepsRelation = Mockery::mock();
+        $stepsRelation = Mockery::mock(\Illuminate\Database\Eloquent\Relations\HasMany::class);
         $stepsRelation->shouldReceive('count')->andReturn(3);
         $approvalFlow->shouldReceive('steps')->andReturn($stepsRelation);
         
         // Mock 2 approved steps
-        $approvalsRelation = Mockery::mock();
+        $approvalsRelation = Mockery::mock(\Illuminate\Database\Eloquent\Relations\MorphMany::class);
         $approvalsRelation->shouldReceive('where')->with('approval_action', 'Approved')->andReturnSelf();
         $approvalsRelation->shouldReceive('count')->andReturn(2);
         
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalFlow')->andReturn($approvalFlow);
         $record->shouldReceive('approvals')->andReturn($approvalsRelation);
@@ -82,6 +84,7 @@ class ApprovalProgressColumnTest extends TestCase
         $column = ApprovalProgressColumn::make('approval_progress');
         
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(false);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(null);
         
         $currentStep = $column->getCurrentStep($record);
@@ -95,6 +98,7 @@ class ApprovalProgressColumnTest extends TestCase
         $column = ApprovalProgressColumn::make('approval_progress');
         
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(true);
         $record->shouldReceive('isApprovalCompleted')->andReturn(true);
         
@@ -112,6 +116,7 @@ class ApprovalProgressColumnTest extends TestCase
         $nextApprover->name = 'John Doe';
         
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(true);
         $record->shouldReceive('isApprovalCompleted')->andReturn(false);
         $record->shouldReceive('getAttribute')->with('nextApprover')->andReturn($nextApprover);
@@ -127,6 +132,7 @@ class ApprovalProgressColumnTest extends TestCase
         $column = ApprovalProgressColumn::make('approval_progress');
         
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(true);
         $record->shouldReceive('isApprovalCompleted')->andReturn(false);
         $record->shouldReceive('getAttribute')->with('nextApprover')->andReturn(null);
@@ -143,12 +149,14 @@ class ApprovalProgressColumnTest extends TestCase
         
         // Test no approval status
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(false);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(null);
         
         $this->assertEquals('not-started', $column->getStepStatus($record));
         
         // Test completed
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(true);
         $record->shouldReceive('isApprovalCompleted')->andReturn(true);
         
@@ -159,6 +167,7 @@ class ApprovalProgressColumnTest extends TestCase
         $approvalStatus->status = 'Pending';
         
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn($approvalStatus);
         $record->shouldReceive('isApprovalCompleted')->andReturn(false);
         
@@ -184,14 +193,17 @@ class ApprovalProgressColumnTest extends TestCase
             
             // Mock the getStepStatus method behavior
             if ($status === 'completed') {
+                $record->shouldReceive('offsetExists')->andReturn(true);
                 $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(true);
                 $record->shouldReceive('isApprovalCompleted')->andReturn(true);
             } elseif ($status === 'unknown') {
+                $record->shouldReceive('offsetExists')->andReturn(false);
                 $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(null);
             } else {
                 $approvalStatus = Mockery::mock();
                 $approvalStatus->status = ucfirst($status);
                 
+                $record->shouldReceive('offsetExists')->andReturn(true);
                 $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn($approvalStatus);
                 $record->shouldReceive('isApprovalCompleted')->andReturn(false);
             }
@@ -207,10 +219,11 @@ class ApprovalProgressColumnTest extends TestCase
         $column = ApprovalProgressColumn::make('approval_progress');
         
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalFlow')->andReturn(null);
         
-        $approvalsRelation = Mockery::mock();
+        $approvalsRelation = Mockery::mock(\Illuminate\Database\Eloquent\Relations\MorphMany::class);
         $approvalsRelation->shouldReceive('where')->with('approval_action', 'Approved')->andReturnSelf();
         $approvalsRelation->shouldReceive('count')->andReturn(0);
         $record->shouldReceive('approvals')->andReturn($approvalsRelation);
@@ -227,15 +240,16 @@ class ApprovalProgressColumnTest extends TestCase
         
         // Mock scenario where approved steps exceed total steps
         $approvalFlow = Mockery::mock(ProcessApprovalFlow::class);
-        $stepsRelation = Mockery::mock();
+        $stepsRelation = Mockery::mock(\Illuminate\Database\Eloquent\Relations\HasMany::class);
         $stepsRelation->shouldReceive('count')->andReturn(2);
         $approvalFlow->shouldReceive('steps')->andReturn($stepsRelation);
         
-        $approvalsRelation = Mockery::mock();
+        $approvalsRelation = Mockery::mock(\Illuminate\Database\Eloquent\Relations\MorphMany::class);
         $approvalsRelation->shouldReceive('where')->with('approval_action', 'Approved')->andReturnSelf();
         $approvalsRelation->shouldReceive('count')->andReturn(3); // More than total steps
         
         $record = Mockery::mock(ApprovableModel::class);
+        $record->shouldReceive('offsetExists')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalStatus')->andReturn(true);
         $record->shouldReceive('getAttribute')->with('approvalFlow')->andReturn($approvalFlow);
         $record->shouldReceive('approvals')->andReturn($approvalsRelation);

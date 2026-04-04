@@ -44,8 +44,8 @@ class PublishingIntegrationTest extends TestCase
         
         // Step 4: Verify views contain expected content
         $statusColumnContent = File::get($viewsPath . '/tables/columns/approval-status-column.blade.php');
-        $this->assertStringContains('$getRecord()->approvalStatus', $statusColumnContent);
-        $this->assertStringContains('isApprovalCompleted()', $statusColumnContent);
+        $this->assertStringContainsString('$getRecord()->approvalStatus', $statusColumnContent);
+        $this->assertStringContainsString('isApprovalCompleted()', $statusColumnContent);
         
         // Step 5: Publish resources
         $this->artisan('approvals:publish', ['--resources' => true])
@@ -120,12 +120,12 @@ class PublishingIntegrationTest extends TestCase
         $actionContent = File::get($actionViewPath);
         
         // Check for valid Blade syntax (no obvious syntax errors)
-        $this->assertStringNotContains('<?php echo', $statusContent); // Should use Blade syntax
-        $this->assertStringContains('@if', $statusContent);
-        $this->assertStringContains('@endif', $statusContent);
+        $this->assertStringNotContainsString('<?php echo', $statusContent); // Should use Blade syntax
+        $this->assertStringContainsString('@if', $statusContent);
+        $this->assertStringContainsString('@endif', $statusContent);
         
-        $this->assertStringContains('@foreach', $actionContent);
-        $this->assertStringContains('@endforeach', $actionContent);
+        $this->assertStringContainsString('@foreach', $actionContent);
+        $this->assertStringContainsString('@endforeach', $actionContent);
     }
 
     /** @test */
@@ -141,13 +141,13 @@ class PublishingIntegrationTest extends TestCase
         $content = File::get($resourcePath);
         
         // Check for expected class structure
-        $this->assertStringContains('class ApprovalFlowResource extends Resource', $content);
-        $this->assertStringContains('public static function form(Form $form): Form', $content);
-        $this->assertStringContains('public static function table(Table $table): Table', $content);
-        $this->assertStringContains('public static function getPages(): array', $content);
+        $this->assertStringContainsString('class ApprovalFlowResource extends Resource', $content);
+        $this->assertStringContainsString('public static function form(Form $form): Form', $content);
+        $this->assertStringContainsString('public static function table(Table $table): Table', $content);
+        $this->assertStringContainsString('public static function getPages(): array', $content);
         
         // Check for proper namespace
-        $this->assertStringContains('namespace EightyNine\Approvals\Filament\Resources;', $content);
+        $this->assertStringContainsString('namespace EightyNine\Approvals\Filament\Resources;', $content);
     }
 
     /** @test */
@@ -169,14 +169,14 @@ class PublishingIntegrationTest extends TestCase
         
         if (File::exists($formBuilderPath)) {
             $content = File::get($formBuilderPath);
-            $this->assertStringContains('class ApprovalFormBuilder', $content);
-            $this->assertStringContains('public static function make()', $content);
+            $this->assertStringContainsString('class ApprovalFormBuilder', $content);
+            $this->assertStringContainsString('public static function make()', $content);
         }
         
         if (File::exists($progressColumnPath)) {
             $content = File::get($progressColumnPath);
-            $this->assertStringContains('class ApprovalProgressColumn', $content);
-            $this->assertStringContains('getProgressPercentage', $content);
+            $this->assertStringContainsString('class ApprovalProgressColumn', $content);
+            $this->assertStringContainsString('getProgressPercentage', $content);
         }
     }
 
@@ -228,8 +228,8 @@ class PublishingIntegrationTest extends TestCase
         
         // Should be overwritten
         $newContent = File::get($configPath);
-        $this->assertStringContains('role_model', $newContent);
-        $this->assertStringNotContains("'modified' => true", $newContent);
+        $this->assertStringContainsString('role_model', $newContent);
+        $this->assertStringNotContainsString("'modified' => true", $newContent);
     }
 
     /** @test */

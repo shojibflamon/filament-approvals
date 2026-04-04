@@ -72,8 +72,7 @@ class PublishedConfigValidationTest extends TestCase
             'show_approval_history',
             'status_colors',
             'date_format',
-            'avatar_provider',
-            'icons'
+            'show_user_avatars',
         ];
         
         foreach ($expectedKeys as $key) {
@@ -99,7 +98,7 @@ class PublishedConfigValidationTest extends TestCase
         $expectedKeys = [
             'prevent_self_approval',
             'audit_approvals',
-            'require_comments_on_rejection'
+            'required_permissions',
         ];
         
         foreach ($expectedKeys as $key) {
@@ -109,6 +108,7 @@ class PublishedConfigValidationTest extends TestCase
         // Verify data types
         $this->assertIsBool($security['prevent_self_approval']);
         $this->assertIsBool($security['audit_approvals']);
+        $this->assertIsArray($security['required_permissions']);
     }
 
     /** @test */
@@ -120,25 +120,20 @@ class PublishedConfigValidationTest extends TestCase
         $notifications = $config['notifications'];
         
         $expectedKeys = [
-            'enabled',
-            'channels',
-            'templates'
+            'email_enabled',
+            'database_enabled',
+            'events'
         ];
         
         foreach ($expectedKeys as $key) {
             $this->assertArrayHasKey($key, $notifications, "Notifications config should have '{$key}' key");
         }
         
-        // Verify channels structure
-        $this->assertIsArray($notifications['channels']);
-        $this->assertContains('database', $notifications['channels']);
-        
-        // Verify templates structure
-        $this->assertIsArray($notifications['templates']);
-        $templateKeys = ['submitted', 'approved', 'rejected'];
-        foreach ($templateKeys as $template) {
-            $this->assertArrayHasKey($template, $notifications['templates']);
-        }
+        // Verify events structure
+        $this->assertIsArray($notifications['events']);
+        $this->assertContains('submitted', $notifications['events']);
+        $this->assertContains('approved', $notifications['events']);
+        $this->assertContains('rejected', $notifications['events']);
     }
 
     /** @test */
@@ -149,13 +144,13 @@ class PublishedConfigValidationTest extends TestCase
         $config = include config_path('approvals.php');
         
         // Check default values are reasonable
-        $this->assertTrue($config['enable_approval_comments']);
+        $this->assertFalse($config['enable_approval_comments']);
         $this->assertTrue($config['enable_rejection_comments']);
         $this->assertTrue($config['navigation']['should_register_navigation']);
-        $this->assertEquals('heroicon-o-check-circle', $config['navigation']['icon']);
+        $this->assertEquals('heroicon-o-clipboard-document-check', $config['navigation']['icon']);
         $this->assertTrue($config['ui']['show_approval_history']);
         $this->assertTrue($config['security']['prevent_self_approval']);
-        $this->assertTrue($config['notifications']['enabled']);
+        $this->assertTrue($config['notifications']['database_enabled']);
     }
 
     /** @test */
@@ -191,7 +186,7 @@ class PublishedConfigValidationTest extends TestCase
         $this->app['config']->set('approvals', include config_path('approvals.php'));
         
         // Verify we can access config values
-        $this->assertTrue(config('approvals.enable_approval_comments'));
+        $this->assertFalse(config('approvals.enable_approval_comments'));
         $this->assertIsArray(config('approvals.navigation'));
         $this->assertIsArray(config('approvals.ui.status_colors'));
     }
@@ -204,13 +199,13 @@ class PublishedConfigValidationTest extends TestCase
         $configContent = File::get(config_path('approvals.php'));
         
         // Check for presence of documentation comments
-        $this->assertStringContains('/*', $configContent);
-        $this->assertStringContains('*/', $configContent);
-        $this->assertStringContains('role_model', $configContent);
-        $this->assertStringContains('navigation', $configContent);
+        $this->assertStringContainsString('/*', $configContent);
+        $this->assertStringContainsString('*/', $configContent);
+        $this->assertStringContainsString('role_model', $configContent);
+        $this->assertStringContainsString('navigation', $configContent);
         
         // Check for inline documentation
-        $this->assertStringContains('//', $configContent);
+        $this->assertStringContainsString('//', $configContent);
     }
 
     /** @test */

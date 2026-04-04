@@ -2,10 +2,13 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/eightynine/filament-approvals.svg?style=flat-square)](https://packagist.org/packages/eightynine/filament-approvals)
 [![Total Downloads](https://img.shields.io/packagist/dt/eightynine/filament-approvals.svg?style=flat-square)](https://packagist.org/packages/eightynine/filament-approvals)
+[![Tests](https://github.com/eighty9nine/filament-approvals/actions/workflows/tests.yml/badge.svg)](https://github.com/eighty9nine/filament-approvals/actions)
 
 This package allows you to implement approval flows in your Laravel Filament application.
 
-_This package brings the [ringlesoft/laravel-process-approval](https://github.com/ringlesoft/laravel-process-approval)) functionalities to filament. You can use all the ringlesoft/laravel-process-approval features in your laravel project. It also uses the [spatie/laravel-permissions](https://github.com/spatie/laravel-permissions) package, so you can use all its features._
+**Compatible with Filament 3, 4 & 5** | **Laravel 11.28+ & 12** | **Livewire 3 & 4**
+
+_This package brings the [ringlesoft/laravel-process-approval](https://github.com/ringlesoft/laravel-process-approval) functionalities to filament. You can use all the ringlesoft/laravel-process-approval features in your laravel project. It also uses the [spatie/laravel-permission](https://github.com/spatie/laravel-permission) package, so you can use all its features._
 
 ## 🛠️ Be Part of the Journey
 
@@ -73,6 +76,7 @@ class LeaveRequest extends ApprovableModel
 ```
 
 4. Create approval flows
+
 - In your dashboard, a "Approval flows menu will have appeared". Click it and start creating the approval flows. The name is the name of the model, that you are using in your flow.
 
 - After you create your first approval create the steps. The steps will require that you have already create roles in your admin panel using the spatie/laravel-permission package.
@@ -149,6 +153,20 @@ Just like that, you are good to go, make some moneyyyyy🤑
 
 To add more approval flows(models), repeat the steps 3-6
 
+## Available Actions
+
+This package provides the following approval actions for both tables and forms:
+
+| Action      | Description                    | Visibility Condition                                                                            |
+| ----------- | ------------------------------ | ----------------------------------------------------------------------------------------------- |
+| **Submit**  | Submit record to approval flow | Record is not yet submitted & user is creator                                                   |
+| **Approve** | Approve the current step       | Record is submitted, user can approve, not completed, not discarded                             |
+| **Reject**  | Reject the record              | Record is submitted, user can approve, not completed, not discarded, not rejected               |
+| **Return**  | Return record to previous step | Record is submitted, user can approve, not completed, not discarded, not rejected, not returned |
+| **Discard** | Discard a rejected record      | Record is rejected & user can approve                                                           |
+
+Each action supports optional comments based on your configuration settings.
+
 ## 🎨 Customization & Publishing
 
 This package provides extensive customization options by publishing various components. You can publish and customize configuration files, views, Filament resources, form/table components, translations, and more.
@@ -168,59 +186,78 @@ This will show you an interactive menu to choose what you want to publish.
 You can also publish specific components using command options:
 
 #### Configuration File
+
 ```bash
 php artisan approvals:publish --config
 ```
+
 This publishes the configuration file to `config/approvals.php` where you can customize:
+
 - Role model configuration
 - Navigation settings (icon, sort order, visibility)
 - Comment settings for approvals and rejections
 
 #### View Files
+
 ```bash
 php artisan approvals:publish --views
 ```
+
 This publishes all Blade view files to `resources/views/vendor/filament-approvals/` for complete UI customization:
+
 - `tables/columns/approval-status-column.blade.php` - Customize the approval status display
 - `tables/columns/approval-status-column-action-view.blade.php` - Customize approval history view
 
 #### Filament Resources
+
 ```bash
 php artisan approvals:publish --resources
 ```
+
 This publishes Filament resources to `app/Filament/Resources/` allowing you to:
+
 - Customize the ApprovalFlowResource completely
 - Modify forms, tables, and pages
 - Add custom validation and business logic
 
 #### Form & Table Components
+
 ```bash
 php artisan approvals:publish --components
 ```
+
 This publishes reusable components to `app/Forms/Approvals/` and `app/Tables/Approvals/`:
+
 - Custom approval action forms
 - Specialized table columns and actions
 - Approval workflow components
 
 #### Translation Files
+
 ```bash
 php artisan approvals:publish --translations
 ```
+
 This publishes language files to `resources/lang/vendor/filament-approvals/` for localization:
+
 - Customize all text and messages
 - Add support for additional languages
 - Modify approval status terminology
 
 #### Development Stubs
+
 ```bash
 php artisan approvals:publish --stubs
 ```
+
 This publishes stub files to `stubs/filament-approvals/` for development and extension.
 
 #### Publish Everything
+
 ```bash
 php artisan approvals:publish --all
 ```
+
 This publishes all customizable files at once.
 
 ### Configuration Options
@@ -231,18 +268,42 @@ After publishing the config file, you can customize these settings in `config/ap
 return [
     // Specify your role model (must be compatible with spatie/laravel-permission)
     "role_model" => App\Models\Role::class,
-    
+
     // Navigation configuration
     "navigation" => [
         "should_register_navigation" => true,
         "icon" => "heroicon-o-clipboard-document-check",
         "sort" => 1
     ],
-    
+
     // Comment settings
     "enable_approval_comments" => false, // Allow comments when approving
-    "enable_return_comments" => true, // Allow comments when returning items
     "enable_rejection_comments" => true, // Allow comments when rejecting
+    "enable_return_comments" => true,    // Allow comments when returning items
+    "enable_discard_comments" => true,   // Allow comments when discarding items
+    "require_rejection_comments" => false, // Require comments for rejections
+    "require_return_comments" => false,    // Require comments for returns
+
+    // UI customization
+    "ui" => [
+        "show_approval_history" => true,
+        "show_user_avatars" => true,
+        "date_format" => "M j, Y g:i A",
+        "status_colors" => [
+            "pending" => "warning",
+            "approved" => "success",
+            "rejected" => "danger",
+            "discarded" => "gray",
+            "submitted" => "info",
+        ],
+    ],
+
+    // Notification settings
+    "notifications" => [
+        "database_enabled" => true,
+        "email_enabled" => false,
+        "events" => ["submitted", "approved", "rejected", "completed"],
+    ],
 ];
 ```
 
@@ -251,11 +312,13 @@ return [
 After publishing views, you can completely customize the appearance:
 
 **Approval Status Column (`resources/views/vendor/filament-approvals/tables/columns/approval-status-column.blade.php`)**:
+
 - Modify status display logic
 - Customize styling and colors
 - Add additional status information
 
 **Approval History View (`resources/views/vendor/filament-approvals/tables/columns/approval-status-column-action-view.blade.php`)**:
+
 - Customize approval history display
 - Modify user avatar and information layout
 - Enhance comment formatting
@@ -273,19 +336,19 @@ class ApprovalFlowResource extends Resource
     {
         return $form->schema([
             // ... existing fields ...
-            
+
             // Add your custom fields
             TextInput::make('custom_field')
                 ->label('Custom Configuration'),
         ]);
     }
-    
+
     // Customize table columns
     public static function table(Table $table): Table
     {
         return $table->columns([
             // ... existing columns ...
-            
+
             // Add custom columns
             TextColumn::make('custom_data')
                 ->label('Custom Information'),
@@ -322,10 +385,10 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
--   [Eighty Nine](https://github.com/eighty9nine)
--   [Tony Partridge](https://github.com/tonypartridge)
--   [Ringlesoft](https://github.com/ringlesoft/laravel-process-approval) for the base approval model logic
--   [All Contributors](../../contributors)
+- [Eighty Nine](https://github.com/eighty9nine)
+- [Tony Partridge](https://github.com/tonypartridge)
+- [Ringlesoft](https://github.com/ringlesoft/laravel-process-approval) for the base approval model logic
+- [All Contributors](../../contributors)
 
 ## License
 
